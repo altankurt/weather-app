@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 
 interface CitySelectorProps {
-  onCitySelect: (city: string) => void
+  onCitySelect: (city: string, isManualSelection: boolean) => void
 }
 
 interface City {
@@ -100,29 +100,10 @@ const CitySelector: React.FC<CitySelectorProps> = ({ onCitySelect }) => {
     lat: number
     lon: number
   } | null>(null)
-
-  useEffect(() => {
-    if ('geolocation' in navigator) {
-      navigator.geolocation.getCurrentPosition(
-        function (position) {
-          setUserLocation({
-            lat: position.coords.latitude,
-            lon: position.coords.longitude,
-          })
-        },
-        function (error) {
-          console.error('Error getting location:', error)
-        }
-      )
-    }
-  }, [])
-
-  useEffect(() => {
-    if (userLocation) {
-      const nearestCity = findNearestCity(userLocation.lat, userLocation.lon)
-      onCitySelect(nearestCity)
-    }
-  }, [userLocation, onCitySelect])
+  const [manuallySelectedCity, setManuallySelectedCity] = useState<
+    string | null
+  >(null)
+  const [locationError, setLocationError] = useState<string | null>(null)
 
   const findNearestCity = (lat: number, lon: number): string => {
     let nearestCity = turkishCities[0]
@@ -173,25 +154,97 @@ const CitySelector: React.FC<CitySelectorProps> = ({ onCitySelect }) => {
     return deg * (Math.PI / 180)
   }
 
+  const getUserLocation = () => {
+    setLocationError(null)
+    if ('geolocation' in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        function (position) {
+          setUserLocation({
+            lat: position.coords.latitude,
+            lon: position.coords.longitude,
+          })
+          const nearestCity = findNearestCity(
+            position.coords.latitude,
+            position.coords.longitude
+          )
+          setManuallySelectedCity(null)
+          onCitySelect(nearestCity, false)
+        },
+        function (error) {
+          console.error('Error getting location:', error)
+          setLocationError('Konum alınamadı. Lütfen manuel seçim yapın.')
+        }
+      )
+    } else {
+      setLocationError('Tarayıcınız konum hizmetlerini desteklemiyor.')
+    }
+  }
+
+  useEffect(() => {
+    if (userLocation && !manuallySelectedCity) {
+      const nearestCity = findNearestCity(userLocation.lat, userLocation.lon)
+      onCitySelect(nearestCity, false)
+    }
+  }, [userLocation, manuallySelectedCity, onCitySelect])
+
+  const handleCityClick = (city: string) => {
+    setManuallySelectedCity(city)
+    onCitySelect(city, true)
+  }
+
   const filteredCities = turkishCities.filter((city) =>
     city.name.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
   return (
     <div className="mx-auto mt-6 max-w-md">
-      <input
-        type="text"
-        placeholder="Şehir ara..."
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-        className="mb-4 w-full rounded-md border border-gray-300 p-2"
-      />
+      <div className="mb-4 flex">
+        <input
+          type="text"
+          placeholder="Şehir ara..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="flex-grow rounded-l-md border border-gray-300 p-2"
+        />
+        <button
+          onClick={getUserLocation}
+          className="rounded-r-md bg-blue-500 p-2 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+            />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+            />
+          </svg>
+        </button>
+      </div>
+      {locationError && (
+        <p className="mb-2 text-sm text-red-500">{locationError}</p>
+      )}
       <div className="grid max-h-60 grid-cols-2 gap-2 overflow-y-auto sm:grid-cols-3">
         {filteredCities.map((city) => (
           <button
             key={city.name}
-            onClick={() => onCitySelect(city.name)}
-            className="rounded-md bg-blue-100 p-2 text-sm transition-colors hover:bg-blue-200"
+            onClick={() => handleCityClick(city.name)}
+            className={`rounded-md p-2 text-sm transition-colors ${
+              city.name === manuallySelectedCity
+                ? 'bg-blue-500 text-white'
+                : 'bg-blue-100 hover:bg-blue-200'
+            }`}
           >
             {city.name}
           </button>
