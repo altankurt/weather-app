@@ -40,7 +40,7 @@ This is a weather application built with Next.js, TypeScript, and Tailwind CSS. 
 
 ## Usage
 
-1. When you run the application for the first time, you'll be prompted to enter an OpenWeatherMap API key.
+1. When you run the application for the first time in a new browser session, you'll be prompted to enter an OpenWeatherMap API key.
 2. If you don't have an API key, sign up at [OpenWeatherMap](https://openweathermap.org/) and get a free API key.
 3. After entering your API key, select a city from the list of Turkish cities.
 4. Current weather information for the selected city will be displayed.
@@ -48,8 +48,10 @@ This is a weather application built with Next.js, TypeScript, and Tailwind CSS. 
 ## About the API Key
 
 - This application uses the OpenWeatherMap API to fetch weather data.
-- For security reasons, your API key is stored locally and is only valid for the duration of your browser session.
-- When you close the browser or tab, your API key is deleted, and you'll need to enter it again.
+- Your API key is stored in the browser's session storage.
+- The API key remains valid until you close the browser or tab.
+- If you refresh the page, you won't need to re-enter the API key.
+- When you open a new tab or restart the browser, you'll need to enter the API key again.
 
 ## Technologies
 
