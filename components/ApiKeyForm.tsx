@@ -1,22 +1,37 @@
 import React, { useState } from 'react'
 
 interface ApiKeyFormProps {
-  onApiKeySubmit: (apiKey: string) => void
+  onApiKeySubmit: (apiKey: string) => Promise<boolean>
 }
 
 const ApiKeyForm: React.FC<ApiKeyFormProps> = ({ onApiKeySubmit }) => {
   const [apiKey, setApiKey] = useState('')
   const [error, setError] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setError('')
+    setIsLoading(true)
+
     if (apiKey.trim().length !== 32) {
       setError('API anahtarı 32 karakter uzunluğunda olmalıdır.')
+      setIsLoading(false)
       return
     }
-    sessionStorage.setItem('openweathermap_api_key', apiKey.trim())
-    onApiKeySubmit(apiKey.trim())
-    setError('')
+
+    try {
+      const isValid = await onApiKeySubmit(apiKey.trim())
+      if (!isValid) {
+        setError('Geçersiz API anahtarı. Lütfen tekrar deneyin.')
+      }
+    } catch (err) {
+      setError(
+        'API anahtarı doğrulanırken bir hata oluştu. Lütfen tekrar deneyin.'
+      )
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -44,8 +59,9 @@ const ApiKeyForm: React.FC<ApiKeyFormProps> = ({ onApiKeySubmit }) => {
         <button
           type="submit"
           className="w-full rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+          disabled={isLoading}
         >
-          Gönder
+          {isLoading ? 'Doğrulanıyor...' : 'Gönder'}
         </button>
       </form>
     </div>

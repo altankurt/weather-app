@@ -7,15 +7,10 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const { city } = req.query
-  const apiKey = process.env.OPENWEATHER_API_KEY
+  const { city, apiKey } = req.query
 
-  if (!city) {
-    return res.status(400).json({ error: 'City is required' })
-  }
-
-  if (!apiKey) {
-    return res.status(500).json({ error: 'API key is not configured' })
+  if (!city || !apiKey) {
+    return res.status(400).json({ error: 'City and API key are required' })
   }
 
   try {
@@ -29,7 +24,11 @@ export default async function handler(
     })
     res.status(200).json(response.data)
   } catch (error) {
-    console.error('Error fetching weather data:', error)
-    res.status(500).json({ error: 'Error fetching weather data' })
+    if (axios.isAxiosError(error) && error.response?.status === 401) {
+      res.status(401).json({ error: 'Invalid API key' })
+    } else {
+      console.error('Error fetching weather data:', error)
+      res.status(500).json({ error: 'Error fetching weather data' })
+    }
   }
 }

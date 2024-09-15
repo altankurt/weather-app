@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 
-interface WeatherDisplayProps {
+export interface WeatherDisplayProps {
   city: string
+  apiKey: string
 }
 
 interface WeatherData {
@@ -20,7 +21,7 @@ interface WeatherData {
   }
 }
 
-const WeatherDisplay: React.FC<WeatherDisplayProps> = ({ city }) => {
+const WeatherDisplay: React.FC<WeatherDisplayProps> = ({ city, apiKey }) => {
   const [weatherData, setWeatherData] = useState<WeatherData | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -31,7 +32,7 @@ const WeatherDisplay: React.FC<WeatherDisplayProps> = ({ city }) => {
       setError(null)
       try {
         const response = await axios.get<WeatherData>(
-          `/api/weather?city=${city}`
+          `/api/weather?city=${city}&apiKey=${apiKey}`
         )
         setWeatherData(response.data)
       } catch (err) {
@@ -45,7 +46,7 @@ const WeatherDisplay: React.FC<WeatherDisplayProps> = ({ city }) => {
     }
 
     fetchWeatherData()
-  }, [city])
+  }, [city, apiKey])
 
   if (loading) return <div className="text-center">Yükleniyor...</div>
   if (error) return <div className="text-center text-red-500">{error}</div>

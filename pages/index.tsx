@@ -1,22 +1,26 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import Head from 'next/head'
 import ApiKeyForm from '../components/ApiKeyForm'
 import CitySelector from '../components/CitySelector'
-import WeatherDisplay from '../components/WeatherDisplay'
+import WeatherDisplay, {
+  WeatherDisplayProps,
+} from '../components/WeatherDisplay'
+import axios from 'axios'
 
 export default function Home() {
   const [apiKey, setApiKey] = useState<string | null>(null)
   const [selectedCity, setSelectedCity] = useState<string | null>(null)
 
-  useEffect(() => {
-    const storedApiKey = sessionStorage.getItem('openweathermap_api_key')
-    if (storedApiKey) {
-      setApiKey(storedApiKey)
+  const handleApiKeySubmit = async (key: string): Promise<boolean> => {
+    try {
+      // API anahtarının geçerliliğini kontrol etmek için örnek bir istek yapıyoruz
+      await axios.get(`/api/weather?city=London&apiKey=${key}`)
+      setApiKey(key)
+      return true
+    } catch (error) {
+      console.error('Error validating API key:', error)
+      return false
     }
-  }, [])
-
-  const handleApiKeySubmit = (key: string) => {
-    setApiKey(key)
   }
 
   const handleCitySelect = (city: string) => {
@@ -41,12 +45,8 @@ export default function Home() {
             <>
               <h2 className="mb-4 text-2xl font-semibold">Şehir Seçin</h2>
               <CitySelector onCitySelect={handleCitySelect} />
-              {selectedCity ? (
-                <WeatherDisplay city={selectedCity} />
-              ) : (
-                <p className="mt-4 text-center text-gray-600">
-                  Konumunuz algılanıyor veya bir şehir seçin...
-                </p>
+              {selectedCity && apiKey && (
+                <WeatherDisplay city={selectedCity} apiKey={apiKey} />
               )}
             </>
           )}
