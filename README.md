@@ -1,32 +1,59 @@
-# Weather App with Next.js
+# Weather App
 
-This is a weather application built with Next.js, TypeScript, and Tailwind CSS. It allows users to check the current weather conditions for cities in Turkey.
+This is a weather application built with Next.js, TypeScript, and Tailwind CSS. Users can view current weather information for cities in Turkey.
 
 ## Features
 
-- API key management for OpenWeatherMap
-- City selection from a list of Turkish cities
-- Display of current weather conditions
+- OpenWeatherMap API key management
+- Weather information display for Turkish cities
+- City selection
 - Responsive design
-- Automatic location-based weather display
+- Location-based automatic weather display
 
-## Setup
+## Installation
 
-1. Clone the repository
-2. Install dependencies with `npm install`
-3. Create a `.env.local` file and add your OpenWeatherMap API key:
+1. Clone the repository:
+
    ```
-   OPENWEATHER_API_KEY=your_api_key_here
+   git clone https://github.com/your_username/weather-app.git
    ```
-4. Run the development server with `npm run dev`
 
-## Technologies Used
+2. Navigate to the project directory:
 
-- Next.js
-- TypeScript
-- Tailwind CSS
-- OpenWeatherMap API
+   ```
+   cd weather-app
+   ```
 
-## License
+3. Install the required dependencies:
 
-[MIT](https://choosealicense.com/licenses/mit/)
+   ```
+   npm install
+   ```
+
+4. Start the development server:
+
+   ```
+   npm run dev
+   ```
+
+5. Open `http://localhost:3000` in your browser.
+
+## Usage
+
+1. When you run the application for the first time, you'll be prompted to enter an OpenWeatherMap API key.
+2. If you don't have an API key, sign up at [OpenWeatherMap](https://openweathermap.org/) and get a free API key.
+3. After entering your API key, select a city from the list of Turkish cities.
+4. Current weather information for the selected city will be displayed.
+
+## About the API Key
+
+- This application uses the OpenWeatherMap API to fetch weather data.
+- For security reasons, your API key is stored locally and is only valid for the duration of your browser session.
+- When you close the browser or tab, your API key is deleted, and you'll need to enter it again.
+
+## Technologies
+
+- [Next.js](https://nextjs.org/)
+- [TypeScript](https://www.typescriptlang.org/)
+- [Tailwind CSS](https://tailwindcss.com/)
+- [OpenWeatherMap API](https://openweathermap.org/api)
