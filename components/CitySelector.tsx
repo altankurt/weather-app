@@ -197,7 +197,7 @@ const CitySelector: React.FC<CitySelectorProps> = ({ onCitySelect }) => {
   )
 
   return (
-    <div className="mx-auto mt-6 max-w-md">
+    <div className="mx-auto mt-6">
       <div className="mb-4 flex">
         <input
           type="text"
@@ -208,26 +208,19 @@ const CitySelector: React.FC<CitySelectorProps> = ({ onCitySelect }) => {
         />
         <button
           onClick={getUserLocation}
-          className="rounded-r-md bg-blue-500 p-2 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+          className="flex items-center rounded-r-md bg-green-500 p-2 text-white hover:bg-green-600 focus:outline-none focus:ring-opacity-50"
         >
+          <span className="mr-2">Current Location</span>
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            className="h-6 w-6"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
+            className="h-5 w-5"
+            viewBox="0 0 20 20"
+            fill="currentColor"
           >
             <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-            />
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+              fillRule="evenodd"
+              d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
+              clipRule="evenodd"
             />
           </svg>
         </button>
@@ -235,15 +228,15 @@ const CitySelector: React.FC<CitySelectorProps> = ({ onCitySelect }) => {
       {locationError && (
         <p className="mb-2 text-sm text-red-500">{locationError}</p>
       )}
-      <div className="grid max-h-60 grid-cols-2 gap-2 overflow-y-auto sm:grid-cols-3">
+      <div className="grid max-h-48 grid-cols-3 gap-4 overflow-y-auto overflow-x-hidden sm:grid-cols-4 md:grid-cols-5">
         {filteredCities.map((city) => (
           <button
             key={city.name}
             onClick={() => handleCityClick(city.name)}
             className={`rounded-md p-2 text-sm transition-colors ${
               city.name === manuallySelectedCity
-                ? 'bg-blue-500 text-white'
-                : 'bg-blue-100 hover:bg-blue-200'
+                ? 'bg-green-500 text-white'
+                : 'bg-gray-400 hover:bg-gray-500'
             }`}
           >
             {city.name}
