@@ -7,29 +7,34 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const { city } = req.query
-  const apiKey = process.env.OPENWEATHER_API_KEY
+  const { city, apiKey } = req.query
 
-  if (!city) {
-    return res.status(400).json({ error: 'City is required' })
-  }
-
-  if (!apiKey) {
-    return res.status(500).json({ error: 'API key is not configured' })
+  if (!city || !apiKey) {
+    return res.status(400).json({ error: 'City and API key are required' })
   }
 
   try {
-    const response = await axios.get(`${BASE_URL}/weather`, {
-      params: {
-        q: city,
-        appid: apiKey,
-        units: 'metric',
-        lang: 'tr',
-      },
+    const [currentWeather, forecast] = await Promise.all([
+      axios.get(`${BASE_URL}/weather`, {
+        params: { q: city, appid: apiKey, units: 'metric', lang: 'tr' },
+      }),
+      axios.get(`${BASE_URL}/forecast`, {
+        params: { q: city, appid: apiKey, units: 'metric', lang: 'tr' },
+      }),
+    ])
+
+    res.status(200).json({
+      current: currentWeather.data,
+      forecast: forecast.data,
     })
-    res.status(200).json(response.data)
   } catch (error) {
     console.error('Error fetching weather data:', error)
-    res.status(500).json({ error: 'Error fetching weather data' })
+    if (axios.isAxiosError(error) && error.response) {
+      res
+        .status(error.response.status)
+        .json({ error: error.response.data.message })
+    } else {
+      res.status(500).json({ error: 'Error fetching weather data' })
+    }
   }
 }
