@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react'
+import * as ScrollArea from '@radix-ui/react-scroll-area'
+import { Button } from '@headlessui/react'
 
 interface CitySelectorProps {
   onCitySelect: (city: string, isManualSelection: boolean) => void
@@ -206,7 +208,7 @@ const CitySelector: React.FC<CitySelectorProps> = ({ onCitySelect }) => {
           onChange={(e) => setSearchTerm(e.target.value)}
           className="flex-grow rounded-l-md border border-gray-300 p-2"
         />
-        <button
+        <Button
           onClick={getUserLocation}
           className="flex items-center rounded-r-md bg-green-500 p-2 text-white hover:bg-green-600 focus:outline-none focus:ring-opacity-50"
         >
@@ -223,26 +225,36 @@ const CitySelector: React.FC<CitySelectorProps> = ({ onCitySelect }) => {
               clipRule="evenodd"
             />
           </svg>
-        </button>
+        </Button>
       </div>
       {locationError && (
         <p className="mb-2 text-sm text-red-500">{locationError}</p>
       )}
-      <div className="grid max-h-48 grid-cols-3 gap-4 overflow-y-auto overflow-x-hidden sm:grid-cols-4 md:grid-cols-5">
-        {filteredCities.map((city) => (
-          <button
-            key={city.name}
-            onClick={() => handleCityClick(city.name)}
-            className={`rounded-md p-2 text-sm transition-colors ${
-              city.name === manuallySelectedCity
-                ? 'bg-green-500 text-white'
-                : 'bg-gray-400 hover:bg-gray-500'
-            }`}
-          >
-            {city.name}
-          </button>
-        ))}
-      </div>
+      <ScrollArea.Root className="h-48 overflow-hidden">
+        <ScrollArea.Viewport className="h-full w-full">
+          <div className="grid grid-cols-3 gap-4 sm:grid-cols-4 md:grid-cols-5">
+            {filteredCities.map((city) => (
+              <Button
+                key={city.name}
+                onClick={() => handleCityClick(city.name)}
+                className={`rounded-md p-2 text-sm transition-colors ${
+                  city.name === manuallySelectedCity
+                    ? 'bg-green-500 text-white'
+                    : 'bg-gray-400 hover:bg-gray-500'
+                }`}
+              >
+                {city.name}
+              </Button>
+            ))}
+          </div>
+        </ScrollArea.Viewport>
+        <ScrollArea.Scrollbar
+          className="flex touch-none select-none bg-black/10 p-0.5 transition-colors duration-150 ease-out hover:bg-black/20"
+          orientation="vertical"
+        >
+          <ScrollArea.Thumb className="relative flex-1 rounded-full bg-black/50 before:absolute before:left-1/2 before:top-1/2 before:h-full before:min-h-[44px] before:w-full before:min-w-[44px] before:-translate-x-1/2 before:-translate-y-1/2 before:content-['']" />
+        </ScrollArea.Scrollbar>
+      </ScrollArea.Root>
     </div>
   )
 }
