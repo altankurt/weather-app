@@ -194,8 +194,20 @@ const CitySelector: React.FC<CitySelectorProps> = ({ onCitySelect }) => {
     onCitySelect(city, true)
   }
 
+  const normalizeString = (str: string): string => {
+    return str
+      .toLowerCase()
+      .replace(/ğ/g, 'g')
+      .replace(/ü/g, 'u')
+      .replace(/ş/g, 's')
+      .replace(/ı/g, 'i')
+      .replace(/i̇/g, 'i')
+      .replace(/ö/g, 'o')
+      .replace(/ç/g, 'c')
+  }
+
   const filteredCities = turkishCities.filter((city) =>
-    city.name.toLowerCase().includes(searchTerm.toLowerCase())
+    normalizeString(city.name).includes(normalizeString(searchTerm))
   )
 
   return (
@@ -206,13 +218,13 @@ const CitySelector: React.FC<CitySelectorProps> = ({ onCitySelect }) => {
           placeholder="Şehir ara..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="flex-grow rounded-l-md border border-gray-300 p-2"
+          className="flex-grow rounded-l-md border border-gray-300 p-2 text-black focus:border-transparent focus:outline-none focus:ring-1 focus:ring-gray-400"
         />
         <Button
           onClick={getUserLocation}
           className="flex items-center rounded-r-md bg-green-500 p-2 text-white hover:bg-green-600 focus:outline-none focus:ring-opacity-50"
         >
-          <span className="mr-2">Current Location</span>
+          <span className="mr-2">Mevcut Konum</span>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             className="h-5 w-5"
