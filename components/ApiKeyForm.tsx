@@ -46,7 +46,7 @@ const ApiKeyForm: React.FC<ApiKeyFormProps> = ({ onApiKeySubmit }) => {
               aria-hidden="true"
             />
             <h2 className="mt-8 text-center text-4xl font-extrabold text-white">
-              OpenWeatherMap API'ye Erişin
+              Open Weather Map API'ye Erişin
             </h2>
             <p className="mt-4 text-center text-lg text-blue-100">
               Hava durumu verilerine erişmek için API anahtarınızı girin
