@@ -36,15 +36,11 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gray-100 py-6 sm:py-12">
       <Head>
-        <title>Hava Durumu Uygulaması</title>
+        <title>Hava Durumu</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
       <div className="container mx-auto px-4">
-        <h1 className="mb-8 text-center text-4xl font-bold text-gray-600">
-          Hava Durumu
-        </h1>
-
         {!apiKey ? (
           <ApiKeyForm onApiKeySubmit={handleApiKeySubmit} />
         ) : (
