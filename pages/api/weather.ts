@@ -14,20 +14,26 @@ export default async function handler(
   }
 
   try {
-    const response = await axios.get(`${BASE_URL}/weather`, {
-      params: {
-        q: city,
-        appid: apiKey,
-        units: 'metric',
-        lang: 'tr',
-      },
+    const [currentWeather, forecast] = await Promise.all([
+      axios.get(`${BASE_URL}/weather`, {
+        params: { q: city, appid: apiKey, units: 'metric', lang: 'tr' },
+      }),
+      axios.get(`${BASE_URL}/forecast`, {
+        params: { q: city, appid: apiKey, units: 'metric', lang: 'tr' },
+      }),
+    ])
+
+    res.status(200).json({
+      current: currentWeather.data,
+      forecast: forecast.data,
     })
-    res.status(200).json(response.data)
   } catch (error) {
-    if (axios.isAxiosError(error) && error.response?.status === 401) {
-      res.status(401).json({ error: 'Invalid API key' })
+    console.error('Error fetching weather data:', error)
+    if (axios.isAxiosError(error) && error.response) {
+      res
+        .status(error.response.status)
+        .json({ error: error.response.data.message })
     } else {
-      console.error('Error fetching weather data:', error)
       res.status(500).json({ error: 'Error fetching weather data' })
     }
   }
