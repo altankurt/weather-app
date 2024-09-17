@@ -36,8 +36,11 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gray-100 py-6 sm:py-12">
       <Head>
-        <title>Hava Durumu</title>
-        <link rel="icon" href="/favicon.ico" />
+        <title>
+          {selectedCity
+            ? `${selectedCity} Hava Durumu | Hava Durumu Uygulaması`
+            : 'Hava Durumu Uygulaması'}
+        </title>
       </Head>
 
       <div className="container mx-auto px-4">
