@@ -80,13 +80,13 @@ const WeatherDisplay: React.FC<WeatherDisplayProps> = ({ city, apiKey }) => {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
-        <div className="rounded-lg bg-gradient-to-br from-blue-400 to-blue-600 p-6 text-white shadow-lg">
-          <h2 className="mb-2 text-3xl font-bold">{city}</h2>
-          <p className="text-xl">{currentDate.toLocaleTimeString()}</p>
-          <p>{currentDate.toLocaleDateString()}</p>
+        <div className="flex flex-col justify-center rounded-lg bg-gradient-to-br from-blue-400 to-blue-600 p-6 text-white shadow-lg text-center h-full">
+          <h2 className="mb-2 text-4xl font-bold">{city}</h2>
+          <p className="text-2xl">{currentDate.toLocaleTimeString()}</p>
+          <p className="text-xl">{currentDate.toLocaleDateString()}</p>
         </div>
 
-        <div className="rounded-lg bg-gradient-to-br from-yellow-400 to-orange-500 p-6 text-white shadow-lg">
+        <div className="flex flex-col justify-center rounded-lg bg-gradient-to-br from-yellow-400 to-orange-500 p-6 text-white shadow-lg h-full">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-5xl font-bold">
@@ -126,7 +126,7 @@ const WeatherDisplay: React.FC<WeatherDisplayProps> = ({ city, apiKey }) => {
       </div>
 
       <div className="mt-8 grid grid-cols-1 gap-8 md:grid-cols-2">
-        <div className="rounded-lg bg-gradient-to-br from-purple-400 to-purple-600 p-6 text-white shadow-lg">
+        <div className="flex flex-col justify-center rounded-lg bg-gradient-to-br from-purple-400 to-purple-600 p-6 text-white shadow-lg h-full">
           <h3 className="mb-4 text-2xl font-bold">5 Günlük Tahmin</h3>
           <div className="flex flex-nowrap overflow-x-auto pb-4">
             {dailyForecast.map((day) => (
@@ -145,7 +145,7 @@ const WeatherDisplay: React.FC<WeatherDisplayProps> = ({ city, apiKey }) => {
           </div>
         </div>
 
-        <div className="rounded-lg bg-gradient-to-br from-green-400 to-green-600 p-6 text-white shadow-lg">
+        <div className="flex flex-col justify-center rounded-lg bg-gradient-to-br from-green-400 to-green-600 p-6 text-white shadow-lg h-full">
           <h3 className="mb-4 text-2xl font-bold">Saatlik Tahmin</h3>
           <div className="flex flex-nowrap overflow-x-auto pb-4">
             {hourlyForecast.map((hour) => (
