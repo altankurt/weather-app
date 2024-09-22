@@ -1,27 +1,49 @@
 import React, { useState, useEffect } from 'react'
 import Head from 'next/head'
 import ApiKeyForm from '../components/ApiKeyForm'
-import CitySelector from '../components/CitySelector'
+import CitySelector, { findNearestCity } from '../components/CitySelector'
 import WeatherDisplay from '../components/WeatherDisplay'
 import axios from 'axios'
+import { getStoredApiKey, storeApiKey } from '../utils/storage'
 
 export default function Home() {
   const [apiKey, setApiKey] = useState<string | null>(null)
   const [selectedCity, setSelectedCity] = useState<string | null>(null)
 
   useEffect(() => {
-    const storedApiKey = sessionStorage.getItem('openweathermap_api_key')
+    const storedApiKey = getStoredApiKey()
     if (storedApiKey) {
       setApiKey(storedApiKey)
+      getUserLocation()
     }
   }, [])
 
+  const getUserLocation = () => {
+    if ('geolocation' in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const nearestCity = findNearestCity(
+            position.coords.latitude,
+            position.coords.longitude
+          )
+          setSelectedCity(nearestCity)
+        },
+        (error) => {
+          console.error('Error getting user location:', error)
+          setSelectedCity('İstanbul') // Varsayılan şehir olarak tanımladım hata mesajı dönmek yerine daha mantıklı geldi
+        }
+      )
+    } else {
+      setSelectedCity('İstanbul')
+    }
+  }
+
   const handleApiKeySubmit = async (key: string): Promise<boolean> => {
     try {
-      // API anahtarının geçerliliğini kontrol etmek için örnek bir istek yapıyoruz
       await axios.get(`/api/weather?city=London&apiKey=${key}`)
-      sessionStorage.setItem('openweathermap_api_key', key)
+      storeApiKey(key)
       setApiKey(key)
+      getUserLocation()
       return true
     } catch (error) {
       console.error('Error validating API key:', error)

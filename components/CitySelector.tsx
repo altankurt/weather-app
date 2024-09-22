@@ -97,6 +97,55 @@ const turkishCities: City[] = [
   { name: 'Düzce', lat: 40.8438, lon: 31.1565 },
 ]
 
+export const findNearestCity = (lat: number, lon: number): string => {
+  let nearestCity = turkishCities[0]
+  let minDistance = calculateDistance(
+    lat,
+    lon,
+    nearestCity.lat,
+    nearestCity.lon
+  )
+
+  for (let i = 1; i < turkishCities.length; i++) {
+    const distance = calculateDistance(
+      lat,
+      lon,
+      turkishCities[i].lat,
+      turkishCities[i].lon
+    )
+    if (distance < minDistance) {
+      minDistance = distance
+      nearestCity = turkishCities[i]
+    }
+  }
+
+  return nearestCity.name
+}
+
+const calculateDistance = (
+  lat1: number,
+  lon1: number,
+  lat2: number,
+  lon2: number
+): number => {
+  const R = 6371 // Dünya'nın yarıçapı (km)
+  const dLat = deg2rad(lat2 - lat1)
+  const dLon = deg2rad(lon2 - lon1)
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(deg2rad(lat1)) *
+      Math.cos(deg2rad(lat2)) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2)
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+  const d = R * c
+  return d
+}
+
+const deg2rad = (deg: number): number => {
+  return deg * (Math.PI / 180)
+}
+
 const CitySelector: React.FC<CitySelectorProps> = ({ onCitySelect }) => {
   const [searchTerm, setSearchTerm] = useState('')
   const [userLocation, setUserLocation] = useState<{
@@ -109,55 +158,6 @@ const CitySelector: React.FC<CitySelectorProps> = ({ onCitySelect }) => {
   const [locationError, setLocationError] = useState<string | null>(null)
   const [isSearchFocused, setIsSearchFocused] = useState(false)
   const searchInputRef = useRef<HTMLInputElement>(null)
-
-  const findNearestCity = (lat: number, lon: number): string => {
-    let nearestCity = turkishCities[0]
-    let minDistance = calculateDistance(
-      lat,
-      lon,
-      nearestCity.lat,
-      nearestCity.lon
-    )
-
-    for (let i = 1; i < turkishCities.length; i++) {
-      const distance = calculateDistance(
-        lat,
-        lon,
-        turkishCities[i].lat,
-        turkishCities[i].lon
-      )
-      if (distance < minDistance) {
-        minDistance = distance
-        nearestCity = turkishCities[i]
-      }
-    }
-
-    return nearestCity.name
-  }
-
-  const calculateDistance = (
-    lat1: number,
-    lon1: number,
-    lat2: number,
-    lon2: number
-  ): number => {
-    const R = 6371 // Dünya'nın yarıçapı (km)
-    const dLat = deg2rad(lat2 - lat1)
-    const dLon = deg2rad(lon2 - lon1)
-    const a =
-      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.cos(deg2rad(lat1)) *
-        Math.cos(deg2rad(lat2)) *
-        Math.sin(dLon / 2) *
-        Math.sin(dLon / 2)
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
-    const d = R * c
-    return d
-  }
-
-  const deg2rad = (deg: number): number => {
-    return deg * (Math.PI / 180)
-  }
 
   const getUserLocation = () => {
     setLocationError(null)
@@ -242,13 +242,13 @@ const CitySelector: React.FC<CitySelectorProps> = ({ onCitySelect }) => {
             onChange={(e) => setSearchTerm(e.target.value)}
             onFocus={() => setIsSearchFocused(true)}
             onBlur={() => setTimeout(() => setIsSearchFocused(false), 200)}
-            className="w-full rounded-md border border-gray-300 p-2 pl-10 text-base text-black focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="w-full rounded-md border border-gray-300 p-2 pl-10 text-sm text-black focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:text-base"
           />
           <MagnifyingGlassIcon className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 transform text-gray-400" />
         </div>
         <Button
           onClick={getUserLocation}
-          className="flex w-full items-center justify-center whitespace-nowrap rounded-md bg-green-500 p-2 text-base text-white hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 sm:w-auto"
+          className="flex w-full items-center justify-center whitespace-nowrap rounded-md bg-green-500 p-2 text-sm text-white hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 sm:w-auto sm:text-base"
         >
           <MapPinIcon className="mr-2 h-5 w-5 flex-shrink-0" />
           <span>Mevcut Konum</span>
