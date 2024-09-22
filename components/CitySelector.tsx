@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react'
-import * as ScrollArea from '@radix-ui/react-scroll-area'
+import React, { useState, useEffect, useRef } from 'react'
 import { Button } from '@headlessui/react'
+import { MagnifyingGlassIcon, MapPinIcon } from '@heroicons/react/24/outline'
+import * as ScrollArea from '@radix-ui/react-scroll-area'
 
 interface CitySelectorProps {
   onCitySelect: (city: string, isManualSelection: boolean) => void
@@ -106,6 +107,8 @@ const CitySelector: React.FC<CitySelectorProps> = ({ onCitySelect }) => {
     string | null
   >(null)
   const [locationError, setLocationError] = useState<string | null>(null)
+  const [isSearchFocused, setIsSearchFocused] = useState(false)
+  const searchInputRef = useRef<HTMLInputElement>(null)
 
   const findNearestCity = (lat: number, lon: number): string => {
     let nearestCity = turkishCities[0]
@@ -192,6 +195,11 @@ const CitySelector: React.FC<CitySelectorProps> = ({ onCitySelect }) => {
   const handleCityClick = (city: string) => {
     setManuallySelectedCity(city)
     onCitySelect(city, true)
+    setSearchTerm('')
+    setIsSearchFocused(false)
+    if (searchInputRef.current) {
+      searchInputRef.current.blur()
+    }
   }
 
   const normalizeString = (str: string): string => {
@@ -210,63 +218,75 @@ const CitySelector: React.FC<CitySelectorProps> = ({ onCitySelect }) => {
     normalizeString(city.name).includes(normalizeString(searchTerm))
   )
 
+  const calculateHeight = () => {
+    const cityCount = filteredCities.length
+    const rowHeight = 40 // Approximate height of each city button
+    const padding = 16 // Top and bottom padding
+    const maxHeight = 384 // Maximum height (96rem)
+    const calculatedHeight = Math.min(
+      cityCount * rowHeight + padding,
+      maxHeight
+    )
+    return calculatedHeight
+  }
+
   return (
-    <div className="mx-auto mt-6">
-      <div className="mb-4 flex">
-        <input
-          type="text"
-          placeholder="Şehir ara..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="flex-grow rounded-l-md border border-gray-300 p-2 text-black focus:border-transparent focus:outline-none focus:ring-1 focus:ring-gray-400"
-        />
+    <div className="mx-auto mt-6 max-w-4xl px-4 sm:px-6 lg:px-8">
+      <div className="mb-4 flex flex-col items-center justify-between space-y-2 sm:flex-row sm:space-x-2 sm:space-y-0">
+        <div className="relative w-full sm:w-auto sm:flex-grow">
+          <input
+            ref={searchInputRef}
+            type="text"
+            placeholder="Şehir ara..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            onFocus={() => setIsSearchFocused(true)}
+            onBlur={() => setTimeout(() => setIsSearchFocused(false), 200)}
+            className="w-full rounded-md border border-gray-300 p-2 pl-10 text-base text-black focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          />
+          <MagnifyingGlassIcon className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 transform text-gray-400" />
+        </div>
         <Button
           onClick={getUserLocation}
-          className="flex items-center rounded-r-md bg-green-500 p-2 text-white hover:bg-green-600 focus:outline-none focus:ring-opacity-50"
+          className="flex w-full items-center justify-center whitespace-nowrap rounded-md bg-green-500 p-2 text-base text-white hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 sm:w-auto"
         >
-          <span className="mr-2">Mevcut Konum</span>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-5 w-5"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-          >
-            <path
-              fillRule="evenodd"
-              d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
-              clipRule="evenodd"
-            />
-          </svg>
+          <MapPinIcon className="mr-2 h-5 w-5 flex-shrink-0" />
+          <span>Mevcut Konum</span>
         </Button>
       </div>
       {locationError && (
         <p className="mb-2 text-sm text-red-500">{locationError}</p>
       )}
-      <ScrollArea.Root className="h-48 overflow-hidden">
-        <ScrollArea.Viewport className="h-full w-full">
-          <div className="grid grid-cols-3 gap-4 sm:grid-cols-4 md:grid-cols-5">
-            {filteredCities.map((city) => (
-              <Button
-                key={city.name}
-                onClick={() => handleCityClick(city.name)}
-                className={`rounded-md p-2 text-sm transition-colors ${
-                  city.name === manuallySelectedCity
-                    ? 'bg-green-500 text-white'
-                    : 'bg-gray-400 hover:bg-gray-500'
-                }`}
-              >
-                {city.name}
-              </Button>
-            ))}
-          </div>
-        </ScrollArea.Viewport>
-        <ScrollArea.Scrollbar
-          className="flex touch-none select-none bg-black/10 p-0.5 transition-colors duration-150 ease-out hover:bg-black/20"
-          orientation="vertical"
+      {isSearchFocused && filteredCities.length > 0 && (
+        <ScrollArea.Root
+          className="overflow-hidden rounded-md border border-gray-200 bg-white shadow-inner"
+          style={{ height: `${calculateHeight()}px` }}
         >
-          <ScrollArea.Thumb className="relative flex-1 rounded-full bg-black/50 before:absolute before:left-1/2 before:top-1/2 before:h-full before:min-h-[44px] before:w-full before:min-w-[44px] before:-translate-x-1/2 before:-translate-y-1/2 before:content-['']" />
-        </ScrollArea.Scrollbar>
-      </ScrollArea.Root>
+          <ScrollArea.Viewport className="h-full w-full">
+            <div className="grid grid-cols-2 gap-2 p-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+              {filteredCities.map((city) => (
+                <Button
+                  key={city.name}
+                  onClick={() => handleCityClick(city.name)}
+                  className={`rounded-md p-2 text-sm transition-colors ${
+                    city.name === manuallySelectedCity
+                      ? 'bg-blue-500 text-white hover:bg-blue-600'
+                      : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+                  }`}
+                >
+                  {city.name}
+                </Button>
+              ))}
+            </div>
+          </ScrollArea.Viewport>
+          <ScrollArea.Scrollbar
+            className="flex touch-none select-none bg-black/10 p-0.5 transition-colors duration-150 ease-out hover:bg-black/20"
+            orientation="vertical"
+          >
+            <ScrollArea.Thumb className="relative flex-1 rounded-full bg-black/50 before:absolute before:left-1/2 before:top-1/2 before:h-full before:min-h-[44px] before:w-full before:min-w-[44px] before:-translate-x-1/2 before:-translate-y-1/2 before:content-['']" />
+          </ScrollArea.Scrollbar>
+        </ScrollArea.Root>
+      )}
     </div>
   )
 }
